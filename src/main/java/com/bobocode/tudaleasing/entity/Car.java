@@ -20,7 +20,7 @@ public class Car {
 
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -44,7 +44,7 @@ public class Car {
     @Column(columnDefinition = "text")
     private String description;
 
-    @Column(name = "description")
+    @Column(name = "available")
     private Boolean available = true;
 
     @Column(name = "created_at", insertable = false, updatable = false)

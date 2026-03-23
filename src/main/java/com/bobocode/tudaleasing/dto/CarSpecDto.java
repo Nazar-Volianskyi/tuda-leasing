@@ -9,7 +9,7 @@ public record CarSpecDto(
         BigDecimal engineCapacity,
         Long enginePower,
         String fuelType,
-        String gearBox,
+        String gearbox,
         String driveType,
         Integer maxSpeed,
         BigDecimal acceleration0100,

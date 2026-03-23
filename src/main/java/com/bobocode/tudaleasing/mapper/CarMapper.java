@@ -33,7 +33,6 @@ public interface CarMapper {
     @Mapping(target = "images", expression = "java(mapImages(car))")
     @Mapping(source = "specs", target = "specs")
     CarDetailsDto toDetailsDto(Car car);
-
     CarSpecDto toSpecDto(CarSpec spec);
 
     default List<String> mapImages(Car car) {
@@ -52,9 +51,4 @@ public interface CarMapper {
                 .findFirst()
                 .orElse(null);
     }
-
-
-
-
-
 }

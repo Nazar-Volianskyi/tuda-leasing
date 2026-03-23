@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.*;
 public class CarController {
 
     private final CarService carService;
-
+    @PostMapping
     public ResponseEntity<String> createCar(@RequestBody CarCreateDto dto) {
 
         Car savedCar = carService.addCar(dto);
 
-        return ResponseEntity.ok("Car is successfully added with ID : " + savedCar.getId());
+        return ResponseEntity.ok("Car is successfully added with : " + savedCar.getId());
     }
 
     @DeleteMapping("/delete/{id}")

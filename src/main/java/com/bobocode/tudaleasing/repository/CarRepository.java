@@ -49,7 +49,6 @@ public interface CarRepository extends JpaRepository<Car, Long>, JpaSpecificatio
     @Query("SELECT DISTINCT cat.name FROM Category cat JOIN cat.cars c")
     List<String> findDistinctCategories();
 
-public interface CarRepository extends JpaRepository<Car, Long> {
     @Query("SELECT DISTINCT col.name FROM Color col JOIN col.cars c")
     List<String> findDistinctColors();
 

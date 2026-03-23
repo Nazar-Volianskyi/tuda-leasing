@@ -1,14 +1,8 @@
 package com.bobocode.tudaleasing.service;
 
 
-import com.bobocode.tudaleasing.dto.CarCreateDto;
-import com.bobocode.tudaleasing.dto.CarCatalogDto;
-import com.bobocode.tudaleasing.dto.CarDetailsDto;
-import com.bobocode.tudaleasing.dto.CarFilterRequest;
-import com.bobocode.tudaleasing.dto.CarFiltersDto;
-import com.bobocode.tudaleasing.entity.Car;
+import com.bobocode.tudaleasing.dto.*;
 import com.bobocode.tudaleasing.mapper.CarMapper;
-import com.bobocode.tudaleasing.repository.CarRepository;
 import com.bobocode.tudaleasing.repository.spec.CarSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,10 +20,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CarService {
     private final CarRepository carRepository;
-    private final CarMapper carMapper;
     private final ModelRepository modelRepository;
     private final CategoryRepository categoryRepository;
     private final ColorRepository colorRepository;
+    private final CarMapper carMapper;
 
     @Transactional
     public Car addCar(CarCreateDto dto) {
@@ -49,9 +43,6 @@ public class CarService {
         car.setDescription(dto.description());
         car.setAvailable(dto.available() != null ? dto.available() : true);
 
-    public Page<CarCatalogDto> getCars(CarFilterRequest filter, Pageable pageable) {
-        if (filter == null) {
-            filter = new CarFilterRequest();
         if (dto.specs() != null) {
             CarSpec specs = new CarSpec();
             specs.setBodyType(dto.specs().bodyType());
@@ -70,14 +61,7 @@ public class CarService {
             specs.setCar(car);
             car.setSpecs(specs);
         }
-        var spec = CarSpecification.build(filter);
-        return carRepository.findAll(spec, pageable)
-                .map(carMapper::toCatalogDto);
-    }
 
-    public CarDetailsDto getCarById(Long id) {
-        Car car = carRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Car not found"));
         if(dto.images() != null && !dto.images().isEmpty()) {
             List<CarImage> images = dto.images().stream().map(carImageDto -> {
                 CarImage carImage = new CarImage();
@@ -88,10 +72,35 @@ public class CarService {
                 return carImage;
             }).collect(Collectors.toList());
 
-        return carMapper.toDetailsDto(car);
-    }
             car.setImages(images);
         }
+
+
+        return carRepository.save(car);
+
+    }
+
+    public void deleteCar(Long id) {
+        Car car = carRepository.findById(id).
+                orElseThrow(() -> new IllegalArgumentException("Car with ID - " + id +" not found"));
+        carRepository.delete(car);
+    }
+
+    public Page<CarCatalogDto> getCars(CarFilterRequest filter, Pageable pageable) {
+        if (filter == null) {
+            filter = new CarFilterRequest();
+        }
+        var spec = CarSpecification.build(filter);
+        return carRepository.findAll(spec, pageable)
+                .map(carMapper::toCatalogDto);
+    }
+
+    public CarDetailsDto getCarById(Long id) {
+        Car car = carRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Car not found"));
+
+        return carMapper.toDetailsDto(car);
+    }
 
     public CarFiltersDto getAvailableFilters(CarFilterRequest filter) {
         if (filter == null) filter = new CarFilterRequest();
@@ -106,16 +115,6 @@ public class CarService {
                 .gearboxes(carRepository.findDistinctGearboxes())
                 .minPrice(carRepository.findMinPrice())
                 .maxPrice(carRepository.findMaxPrice())
-        return carRepository.save(car);
-
-    }
-
-    public void deleteCar(Long id) {
-        Car car = carRepository.findById(id).
-                orElseThrow(() -> new IllegalArgumentException("Car with ID - " + id +" not found"));
-        carRepository.delete(car);
-    }
-}
 
                 .bodyTypes(carRepository.findDistinctBodyTypes())
                 .doors(carRepository.findDistinctDoors())
@@ -125,4 +124,7 @@ public class CarService {
                 .driveTypes(carRepository.findDistinctDriveTypes())
                 .maxSpeeds(carRepository.findDistinctMaxSpeeds())
                 .build();
-}}
+    }
+
+
+}

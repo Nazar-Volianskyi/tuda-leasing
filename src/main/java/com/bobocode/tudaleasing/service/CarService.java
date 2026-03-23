@@ -51,7 +51,7 @@ public class CarService {
             specs.setEngineCapacity(dto.specs().engineCapacity());
             specs.setEnginePower(dto.specs().enginePower());
             specs.setFuelType(dto.specs().fuelType());
-            specs.setGearbox(dto.specs().gearBox());
+            specs.setGearbox(dto.specs().gearbox());
             specs.setDriveType(dto.specs().driveType());
             specs.setMaxSpeed(dto.specs().maxSpeed());
             specs.setAcceleration0100(dto.specs().acceleration0100());

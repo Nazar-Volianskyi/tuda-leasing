@@ -17,7 +17,7 @@ import java.util.List;
 public class Color {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, length = 50)
@@ -28,5 +28,5 @@ public class Color {
 
     @OneToMany(mappedBy = "color")
     @Setter(AccessLevel.PRIVATE)
-    private List<Car> categories = new ArrayList<>();
+    private List<Car> cars = new ArrayList<>();
 }

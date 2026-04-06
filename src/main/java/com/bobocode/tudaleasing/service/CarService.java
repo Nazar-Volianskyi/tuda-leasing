@@ -80,12 +80,14 @@ public class CarService {
 
     }
 
+    @Transactional
     public void deleteCar(Long id) {
         Car car = carRepository.findById(id).
                 orElseThrow(() -> new IllegalArgumentException("Car with ID - " + id +" not found"));
         carRepository.delete(car);
     }
 
+    @Transactional(readOnly = true)
     public Page<CarCatalogDto> getCars(CarFilterRequest filter, Pageable pageable) {
         if (filter == null) {
             filter = new CarFilterRequest();
@@ -95,6 +97,7 @@ public class CarService {
                 .map(carMapper::toCatalogDto);
     }
 
+    @Transactional(readOnly = true)
     public CarDetailsDto getCarById(Long id) {
         Car car = carRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Car not found"));
@@ -102,6 +105,7 @@ public class CarService {
         return carMapper.toDetailsDto(car);
     }
 
+    @Transactional(readOnly = true)
     public CarFiltersDto getAvailableFilters(CarFilterRequest filter) {
         if (filter == null) filter = new CarFilterRequest();
 

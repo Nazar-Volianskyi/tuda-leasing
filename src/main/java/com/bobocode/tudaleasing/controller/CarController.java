@@ -30,18 +30,18 @@ public class CarController {
     }
 
     @GetMapping
-    public Page<CarCatalogDto> getCars(CarFilterRequest filter,
-                                       Pageable pageable) {
-        return carService.getCars(filter, pageable);
+    public ResponseEntity<Page<CarCatalogDto>> getCars(CarFilterRequest filter,
+                                                       Pageable pageable) {
+        return ResponseEntity.ok(carService.getCars(filter, pageable));
     }
 
     @GetMapping("/{id}")
-    public CarDetailsDto getCar(@PathVariable Long id) {
-        return carService.getCarById(id);
+    public ResponseEntity<CarDetailsDto> getCar(@PathVariable Long id) {
+        return ResponseEntity.ok(carService.getCarById(id));
     }
 
     @GetMapping("/filters")
-    public CarFiltersDto getFilters(CarFilterRequest filter) {
-        return carService.getAvailableFilters(filter);
+    public ResponseEntity<CarFiltersDto> getFilters(CarFilterRequest filter) {
+        return ResponseEntity.ok(carService.getAvailableFilters(filter));
     }
 }

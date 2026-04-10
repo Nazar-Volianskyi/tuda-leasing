@@ -3,12 +3,13 @@ package com.bobocode.tudaleasing.dto;
 import lombok.Builder;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
 @Data
 @Builder
-public class CarFiltersDto {
+public class CarFiltersDto implements Serializable {
     private List<String> brands;
     private List<String> models;
     private List<String> categories;

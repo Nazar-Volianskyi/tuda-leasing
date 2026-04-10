@@ -5,6 +5,8 @@ import com.bobocode.tudaleasing.dto.*;
 import com.bobocode.tudaleasing.mapper.CarMapper;
 import com.bobocode.tudaleasing.repository.spec.CarSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -81,6 +83,7 @@ public class CarService {
     }
 
     @Transactional
+    @CacheEvict(value = "car_details", key = "#id")
     public void deleteCar(Long id) {
         Car car = carRepository.findById(id).
                 orElseThrow(() -> new IllegalArgumentException("Car with ID - " + id +" not found"));
@@ -98,13 +101,14 @@ public class CarService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "car_details", key = "#id")
     public CarDetailsDto getCarById(Long id) {
         Car car = carRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Car not found"));
 
         return carMapper.toDetailsDto(car);
     }
-
+    @Cacheable(value = "filters", key = "#filter.brand != null ? #filter.brand : 'all'")
     @Transactional(readOnly = true)
     public CarFiltersDto getAvailableFilters(CarFilterRequest filter) {
         if (filter == null) filter = new CarFilterRequest();

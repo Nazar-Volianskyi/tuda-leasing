@@ -1,14 +1,14 @@
 package com.bobocode.tudaleasing.mapper;
 
 
-import com.bobocode.tudaleasing.dto.CarCatalogDto;
-import com.bobocode.tudaleasing.dto.CarDetailsDto;
-import com.bobocode.tudaleasing.dto.CarSpecDto;
+import com.bobocode.tudaleasing.dto.*;
 import com.bobocode.tudaleasing.entity.Car;
 import com.bobocode.tudaleasing.entity.CarImage;
 import com.bobocode.tudaleasing.entity.CarSpec;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -34,6 +34,38 @@ public interface CarMapper {
     @Mapping(source = "specs", target = "specs")
     CarDetailsDto toDetailsDto(Car car);
     CarSpecDto toSpecDto(CarSpec spec);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "model", ignore = true)
+    @Mapping(target = "category", ignore = true)
+    @Mapping(target = "color", ignore = true)
+    Car toEntity(CarCreateDto dto);
+
+    CarSpec toSpecEntity(CarSpecDto dto);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "car", ignore = true)
+    CarImage toImageEntity(CarImageDto dto);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "model", ignore = true)
+    @Mapping(target = "category", ignore = true)
+    @Mapping(target = "color", ignore = true)
+    void updateEntity(CarCreateDto dto, @MappingTarget Car car);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "car", ignore = true)
+    void updateSpecEntity(CarSpecDto dto, @MappingTarget CarSpec spec);
+
+    @AfterMapping
+    default void linkRelations(@MappingTarget Car car) {
+        if (car.getSpecs() != null) {
+            car.getSpecs().setCar(car);
+        }
+        if (car.getImages() != null) {
+            car.getImages().forEach(img -> img.setCar(car));
+        }
+    }
 
     default List<String> mapImages(Car car) {
         if (car.getImages() == null) return List.of();

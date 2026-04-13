@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.bobocode.tudaleasing.entity.*;
 import com.bobocode.tudaleasing.repository.*;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,60 +27,63 @@ public class CarService {
     private final CategoryRepository categoryRepository;
     private final ColorRepository colorRepository;
     private final CarMapper carMapper;
+    private final ImageStorageService imageStorageService;
 
     @Transactional
-    public Car addCar(CarCreateDto dto) {
-        Model model = modelRepository.findById(dto.modelId())
-                .orElseThrow(() -> new IllegalArgumentException("Model not found"));
-        Category category = categoryRepository.findById(dto.categoryId())
-                .orElseThrow(() -> new IllegalArgumentException("Category not found"));
-        Color color = colorRepository.findById(dto.colorId())
-                .orElseThrow(() -> new IllegalArgumentException("Color not found"));
+    public Car addCar(CarCreateDto dto, List<MultipartFile> files) {
+        Car car = carMapper.toEntity(dto);
 
-        Car car = new Car();
-        car.setModel(model);
-        car.setCategory(category);
-        car.setColor(color);
-        car.setYear(dto.year());
-        car.setFullPrice(dto.fullPrice());
-        car.setDescription(dto.description());
-        car.setAvailable(dto.available() != null ? dto.available() : true);
+        if (files != null && !files.isEmpty()) {
+            List<CarImage> images = files.stream()
+                    .map(file -> {
+                        String url = imageStorageService.uploadImage(file);
+                        CarImage carImage = new CarImage();
+                        carImage.setImageUrl(url);
+                        carImage.setCar(car);
+                        carImage.setIsMain(false);
+                        return carImage;
+                    })
+                    .toList();
 
-        if (dto.specs() != null) {
-            CarSpec specs = new CarSpec();
-            specs.setBodyType(dto.specs().bodyType());
-            specs.setDoors(dto.specs().doors());
-            specs.setSeats(dto.specs().seats());
-            specs.setEngineCapacity(dto.specs().engineCapacity());
-            specs.setEnginePower(dto.specs().enginePower());
-            specs.setFuelType(dto.specs().fuelType());
-            specs.setGearbox(dto.specs().gearbox());
-            specs.setDriveType(dto.specs().driveType());
-            specs.setMaxSpeed(dto.specs().maxSpeed());
-            specs.setAcceleration0100(dto.specs().acceleration0100());
-            specs.setFuelTankCapacity(dto.specs().fuelTankCapacity());
-            specs.setTrunkCapacity(dto.specs().trunkCapacity());
-            specs.setWeight(dto.specs().weight());
-            specs.setCar(car);
-            car.setSpecs(specs);
-        }
-
-        if(dto.images() != null && !dto.images().isEmpty()) {
-            List<CarImage> images = dto.images().stream().map(carImageDto -> {
-                CarImage carImage = new CarImage();
-                carImage.setImageUrl(carImageDto.imageUrl());
-                carImage.setIsMain(carImageDto.isMain());
-
-                carImage.setCar(car);
-                return carImage;
-            }).collect(Collectors.toList());
-
+            if (!images.isEmpty()) images.get(0).setIsMain(true);
             car.setImages(images);
         }
 
+        car.setModel(modelRepository.findById(dto.modelId())
+                .orElseThrow(() -> new IllegalArgumentException("Model not found")));
+        car.setCategory(categoryRepository.findById(dto.categoryId())
+                .orElseThrow(() -> new IllegalArgumentException("Category not found")));
+        car.setColor(colorRepository.findById(dto.colorId())
+                .orElseThrow(() -> new IllegalArgumentException("Color not found")));
+
+        if (car.getAvailable() == null) {
+            car.setAvailable(true);
+        }
 
         return carRepository.save(car);
+    }
 
+    @Transactional
+    public Car updateCar(Long carId, CarCreateDto dto) {
+        Car existingCar = carRepository.findById(carId)
+                .orElseThrow(() -> new IllegalArgumentException("Car with ID " + carId + " not found"));
+        carMapper.updateEntity(dto, existingCar);
+        if (dto.modelId() != null) {
+            existingCar.setModel(modelRepository.findById(dto.modelId())
+                    .orElseThrow(() -> new IllegalArgumentException("Model not found")));
+        }
+        if (dto.categoryId() != null) {
+            existingCar.setCategory(categoryRepository.findById(dto.categoryId())
+                    .orElseThrow(() -> new IllegalArgumentException("Category not found")));
+        }
+        if (dto.colorId() != null) {
+            existingCar.setColor(colorRepository.findById(dto.colorId())
+                    .orElseThrow(() -> new IllegalArgumentException("Color not found")));
+        }
+        if (dto.available() != null) {
+            existingCar.setAvailable(dto.available());
+        }
+        return carRepository.save(existingCar);
     }
 
     @Transactional

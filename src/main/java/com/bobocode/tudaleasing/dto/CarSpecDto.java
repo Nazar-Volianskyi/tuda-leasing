@@ -1,5 +1,6 @@
 package com.bobocode.tudaleasing.dto;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 public record CarSpecDto(
@@ -16,4 +17,4 @@ public record CarSpecDto(
         Long fuelTankCapacity,
         Long trunkCapacity,
         Long weight
-) {}
+) implements Serializable {}

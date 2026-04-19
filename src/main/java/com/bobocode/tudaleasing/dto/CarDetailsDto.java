@@ -1,5 +1,6 @@
 package com.bobocode.tudaleasing.dto;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -15,4 +16,4 @@ public record CarDetailsDto(
         Boolean available,
         List<String> images,
         CarSpecDto specs
-) {}
+)implements Serializable {}

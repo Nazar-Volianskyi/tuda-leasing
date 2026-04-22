@@ -15,8 +15,8 @@ import com.bobocode.tudaleasing.repository.*;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -136,6 +136,48 @@ public class CarService {
                 .driveTypes(carRepository.findDistinctDriveTypes())
                 .maxSpeeds(carRepository.findDistinctMaxSpeeds())
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public CarManagerOptionsDto getManagerOptions() {
+        var models = modelRepository.findAll().stream()
+                .map(model -> new LookupOptionDto(
+                        model.getId(),
+                        model.getName(),
+                        model.getName(),
+                        model.getBrand().getId(),
+                        model.getBrand().getName()
+                ))
+                .toList();
+
+        var brandsMap = new LinkedHashMap<Long, LookupOptionDto>();
+        models.forEach(model -> brandsMap.putIfAbsent(
+                model.groupId(),
+                new LookupOptionDto(model.groupId(), model.groupName(), model.groupName(), null, null)
+        ));
+        var brands = brandsMap.values().stream().toList();
+
+        var categories = categoryRepository.findAll().stream()
+                .map(category -> new LookupOptionDto(
+                        category.getId(),
+                        category.getName(),
+                        category.getName(),
+                        null,
+                        null
+                ))
+                .toList();
+
+        var colors = colorRepository.findAll().stream()
+                .map(color -> new LookupOptionDto(
+                        color.getId(),
+                        color.getName(),
+                        color.getName(),
+                        null,
+                        null
+                ))
+                .toList();
+
+        return new CarManagerOptionsDto(brands, models, categories, colors);
     }
 
 

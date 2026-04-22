@@ -55,6 +55,11 @@ public class CarController {
         return ResponseEntity.ok(carService.getAvailableFilters(filter));
     }
 
+    @GetMapping("/options")
+    public ResponseEntity<CarManagerOptionsDto> getManagerOptions() {
+        return ResponseEntity.ok(carService.getManagerOptions());
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<CarDetailsDto> updateCar(
             @PathVariable Long id,

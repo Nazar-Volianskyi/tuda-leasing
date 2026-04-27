@@ -55,6 +55,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/leasing/**", "/feedback/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/feedback/**").permitAll()
 
+                        // Public calculator endpoints
+                        .requestMatchers(HttpMethod.POST, "/api/calculator/**").permitAll()
+
                         // Swagger / OpenAPI — public
                         .requestMatchers(
                                 "/swagger-ui/**",

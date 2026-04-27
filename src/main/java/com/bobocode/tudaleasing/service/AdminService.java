@@ -8,6 +8,7 @@ import com.bobocode.tudaleasing.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ public class AdminService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Cacheable("users_list")
     @Transactional(readOnly = true)
@@ -39,6 +41,7 @@ public class AdminService {
         }
 
         User user = userMapper.toEntity(request);
+        user.setPassword(passwordEncoder.encode(request.password()));
         User savedUser = userRepository.save(user);
 
         return userMapper.toDto(savedUser);

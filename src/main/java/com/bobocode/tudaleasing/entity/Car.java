@@ -51,6 +51,7 @@ public class Car {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "car", cascade = CascadeType.ALL)
+    @org.hibernate.annotations.BatchSize(size = 25)
     private List<CarImage> images = new ArrayList<>();
 
     @OneToOne(mappedBy = "car", cascade = CascadeType.ALL)

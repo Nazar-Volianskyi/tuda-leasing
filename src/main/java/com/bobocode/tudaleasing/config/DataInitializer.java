@@ -13,11 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/**
- * Runs on startup:
- * 1. Re-encodes any plain-text passwords that are not yet BCrypt-hashed.
- * 2. Creates a default ADMINISTRATOR account if no admins exist.
- */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -37,8 +32,6 @@ public class DataInitializer implements ApplicationRunner {
         createDefaultAdminIfNeeded();
     }
 
-    // ─── Migrate plain-text → BCrypt ─────────────────────────────────────────
-
     private void migratePasswordsIfNeeded() {
         List<User> users = userRepository.findAll();
         int count = 0;
@@ -56,7 +49,6 @@ public class DataInitializer implements ApplicationRunner {
         }
     }
 
-    // ─── Ensure at least one admin exists ────────────────────────────────────
 
     private void createDefaultAdminIfNeeded() {
         boolean adminExists = userRepository.findAll().stream()

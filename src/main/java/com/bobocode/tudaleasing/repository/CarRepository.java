@@ -16,13 +16,12 @@ import java.util.Optional;
 
 public interface CarRepository extends JpaRepository<Car, Long>, JpaSpecificationExecutor<Car> {
 
+
     @EntityGraph(attributePaths = {
             "model.brand",
             "category",
             "color",
-            "specs",
-            "images"
-
+            "specs"
     })
     Page<Car> findAll(Specification<Car> spec, Pageable pageable);
 
